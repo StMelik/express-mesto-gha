@@ -13,6 +13,16 @@ mongoose.connect("mongodb://localhost:27017/mestodb")
 
 app.use('/users', require('./routers/users'))
 
+app.use((req, res, next) => {
+    req.user = {
+        _id: '627d39d969b36fd3667e90bf' // вставьте сюда _id созданного в предыдущем пункте пользователя
+    };
+
+    next();
+})
+
+app.use("/cards", require("./routers/cards"))
+
 app.listen(PORT, () => {
     console.log(`Сервер работает на ${PORT} порту`)
 })
