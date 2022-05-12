@@ -11,7 +11,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect("mongodb://localhost:27017/mestodb")
 
-app.use('/users', require('./routers/users'))
 
 app.use((req, res, next) => {
     req.user = {
@@ -21,6 +20,7 @@ app.use((req, res, next) => {
     next();
 })
 
+app.use('/users', require('./routers/users'))
 app.use("/cards", require("./routers/cards"))
 
 app.listen(PORT, () => {
