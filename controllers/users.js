@@ -7,8 +7,9 @@ const getUsers = (req, res) => {
 }
 
 const getUser = (req, res) => {
-    User.findOne({_id: req.params.id})
+    User.findById(req.params.id)
         .then(user => res.send({user}))
+        .catch(() => res.status(500).send({message: "Произошла ошибка"}))
 }
 
 const createUser = (req, res) => {
@@ -16,6 +17,7 @@ const createUser = (req, res) => {
 
     User.create({name, about, avatar})
         .then(user => res.send({user}))
+        .catch(() => res.status(500).send({message: "Произошла ошибка"}))
 }
 
 const updateUser = (req, res) => {
