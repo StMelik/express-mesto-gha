@@ -2,13 +2,15 @@ const User = require('../models/user');
 const ERROR_CODE = require('../utils/constants');
 
 const getUsers = (req, res) => {
-  User.find({})
+  User
+    .find({})
     .then((users) => res.send({ users }))
-    .catch(() => res.status(ERROR_CODE.DEFAULT).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(ERROR_CODE.SERVER).send({ message: 'Произошла ошибка' }));
 };
 
 const getUser = (req, res) => {
-  User.findById(req.params.id)
+  User
+    .findById(req.params.id)
     .then((user) => {
       if (!user) {
         res
@@ -16,25 +18,25 @@ const getUser = (req, res) => {
           .send({ message: 'Пользователь по указанному id не найден' });
         return;
       }
-
-      res.send({ user });
+      res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.kind === 'ObjectId') {
         res
-          .status(ERROR_CODE.NOT_FOUND)
+          .status(ERROR_CODE.INCORRECT_DATA)
           .send({ message: 'Пользователь по указанному id не найден' });
         return;
       }
-      res.status(ERROR_CODE.DEFAULT).send({ message: 'Произошла ошибка' });
+      res.status(ERROR_CODE.SERVER).send({ message: 'Произошла ошибка' });
     });
 };
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  User.create({ name, about, avatar })
-    .then((user) => res.send({ user }))
+  User
+    .create({ name, about, avatar })
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
@@ -42,7 +44,7 @@ const createUser = (req, res) => {
           .send({ message: 'Переданы некорректные данные при создании пользователя.' });
         return;
       }
-      res.status(ERROR_CODE.DEFAULT).send({ message: 'Произошла ошибка' });
+      res.status(ERROR_CODE.SERVER).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -56,7 +58,8 @@ const updateUser = (req, res) => {
     return;
   }
 
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+  User
+    .findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -65,7 +68,7 @@ const updateUser = (req, res) => {
           .send({ message: 'Пользователь по указанному id не найден' });
         return;
       }
-      res.status(ERROR_CODE.DEFAULT).send({ message: 'Произошла ошибка' });
+      res.status(ERROR_CODE.SERVER).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -79,7 +82,8 @@ const updateAvatar = (req, res) => {
     return;
   }
 
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+  User
+    .findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -88,7 +92,7 @@ const updateAvatar = (req, res) => {
           .send({ message: 'Пользователь по указанному id не найден' });
         return;
       }
-      res.status(ERROR_CODE.DEFAULT).send({ message: 'Произошла ошибка' });
+      res.status(ERROR_CODE.SERVER).send({ message: 'Произошла ошибка' });
     });
 };
 
