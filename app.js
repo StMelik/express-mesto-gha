@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const ERROR_CODE = require('./utils/constants');
 
-const { PORT = 3030 } = process.env;
+const { PORT = 3000 } = process.env;
 
 const app = express();
 
