@@ -43,7 +43,7 @@ const deleteCard = (req, res) => {
       if (err.kind === 'ObjectId') {
         res
           .status(ERROR_CODE.INCORRECT_DATA)
-          .send({ message: 'Карточка с указанным _id не найдена.' });
+          .send({ message: 'Передан некорректный _id карточки.' });
         return;
       }
       res.status(ERROR_CODE.SERVER).send({ message: 'Произошла ошибка' });
