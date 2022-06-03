@@ -2,7 +2,7 @@ const Card = require('../models/card');
 const NotFoundError = require('../utils/errors/NotFound');
 const BadRequestError = require('../utils/errors/BadRequest');
 const ServerError = require('../utils/errors/Server');
-const AuthError = require('../utils/errors/Auth');
+const ForbiddenError = require('../utils/errors/Forbidden');
 
 const getCards = (_, res, next) => {
   Card
@@ -38,7 +38,7 @@ const deleteCard = (req, res, next) => {
       }
 
       if (JSON.stringify(card.owner) !== JSON.stringify(req.user._id)) {
-        next(new AuthError('Невозможно удалить карточку.'));
+        next(new ForbiddenError('Невозможно удалить карточку.'));
         return;
       }
 

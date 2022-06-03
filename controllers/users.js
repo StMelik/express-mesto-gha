@@ -5,6 +5,7 @@ const ConflictError = require('../utils/errors/Conflict');
 const NotFoundError = require('../utils/errors/NotFound');
 const BadRequestError = require('../utils/errors/BadRequest');
 const ServerError = require('../utils/errors/Server');
+const AuthError = require('../utils/errors/Auth');
 
 const getUsers = (_, res, next) => {
   User
@@ -13,9 +14,28 @@ const getUsers = (_, res, next) => {
     .catch(() => next(new ServerError('Произошла ошибка.')));
 };
 
-const getUser = (req, res, next) => {
+const getMe = (req, res, next) => {
   User
     .findById(req.user)
+    .then((user) => {
+      if (!user) {
+        next(new NotFoundError('Пользователь по указанному id не найден.'));
+        return;
+      }
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Пользователь по указанному id не найден.');
+      }
+      throw new ServerError('Произошла ошибка.');
+    })
+    .catch(next);
+};
+
+const getUser = (req, res, next) => {
+  User
+    .findById(req.params.userId)
     .then((user) => {
       if (!user) {
         next(new NotFoundError('Пользователь по указанному id не найден.'));
@@ -45,7 +65,12 @@ const createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.send(user))
+    .then((user) => res.send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Переданы некорректные данные при создании пользователя.');
@@ -100,7 +125,7 @@ const updateAvatar = (req, res, next) => {
     .catch(next);
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findUserByCredentials(email, password)
@@ -112,11 +137,16 @@ const login = (req, res) => {
       );
 
       res.send({ token });
-    });
+    })
+    .catch((err) => {
+      throw new AuthError(err.message);
+    })
+    .catch(next);
 };
 
 module.exports = {
   getUsers,
+  getMe,
   getUser,
   createUser,
   updateUser,

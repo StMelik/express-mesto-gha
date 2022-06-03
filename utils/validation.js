@@ -1,9 +1,21 @@
 const { celebrate, Joi } = require('celebrate');
 
+// eslint-disable-next-line no-useless-escape
+const reqExpLink = /https?:\/\/(www)?[\-\.~:\/\?#\[\]@!$&'\(\)*\+,;=\w]+#?\b/;
+
 const validationUser = celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(reqExpLink),
+  }),
+});
+
+const validationUserId = celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().length(24),
   }),
 });
 
@@ -16,14 +28,14 @@ const validationProfile = celebrate({
 
 const validationAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required(),
+    avatar: Joi.string().required().pattern(reqExpLink),
   }),
 });
 
 const validationCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().required(),
+    link: Joi.string().required().pattern(reqExpLink),
   }),
 });
 
@@ -35,6 +47,7 @@ const validationCardId = celebrate({
 
 module.exports = {
   validationUser,
+  validationUserId,
   validationProfile,
   validationAvatar,
   validationCard,
