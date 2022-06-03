@@ -111,7 +111,10 @@ const login = (req, res) => {
       );
 
       res.send({ token });
-    });
+    })
+    .catch(err => {
+      console.log(err);
+    })
 };
 
 module.exports = {

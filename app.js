@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const ERROR_CODE = require('./utils/constants');
 const auth = require('./middlewares/auth');
+const { errors } = require('celebrate')
 
 const { PORT = 3000 } = process.env;
 
@@ -22,7 +23,9 @@ app.use('/', (req, res) => {
     .send({ message: 'Ресурс не найден. Проверьте URL и метод запроса' });
 });
 
-app.use((err, _, res, __) => {
+app.use(errors())
+
+app.use((err, _, res, next) => {
   res
     .status(err.statusCode)
     .send({ message: err.message });
