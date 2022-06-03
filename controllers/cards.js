@@ -1,7 +1,8 @@
 const Card = require('../models/card');
-const {
-  NotFoundError, BadRequestError, ServerError, AuthError,
-} = require('../utils/errors');
+const NotFoundError = require('../utils/errors/NotFound');
+const BadRequestError = require('../utils/errors/BadRequest');
+const ServerError = require('../utils/errors/Server');
+const AuthError = require('../utils/errors/Auth');
 
 const getCards = (_, res, next) => {
   Card

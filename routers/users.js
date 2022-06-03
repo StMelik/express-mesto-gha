@@ -3,7 +3,7 @@ const {
   getUsers, getUser, createUser, updateUser, updateAvatar, login,
 } = require('../controllers/users');
 const auth = require('../middlewares/auth');
-const { validationUser, validationProfile, validationAvatar } = require('../utils/validation')
+const { validationUser, validationProfile, validationAvatar } = require('../utils/validation');
 
 router.post('/signin', validationUser, login);
 

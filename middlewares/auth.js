@@ -1,27 +1,26 @@
-const ERROR_CODE = require('../utils/constants');
-const jwt = require('jsonwebtoken')
-const { AuthError } = require('../utils/errors')
+const jwt = require('jsonwebtoken');
+const AuthError = require('../utils/errors/Auth');
 
-module.exports = (req, res, next) => {
+module.exports = (req, _, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    next(new AuthError('Необходима авторизация'))
-    return
+    next(new AuthError('Необходима авторизация'));
+    return;
   }
 
-  const token = authorization.replace('Bearer ', '')
+  const token = authorization.replace('Bearer ', '');
 
-  let payload
+  let payload;
 
   try {
-    payload = jwt.verify(token, 'secret-key')
-  } catch {
-    next(new AuthError('Необходима авторизация'))
-    return
+    payload = jwt.verify(token, 'secret-key');
+  } catch (err) {
+    next(new AuthError('Необходима авторизация'));
+    return;
   }
 
-  req.user = payload
+  req.user = payload;
 
-  next()
-}
+  next();
+};

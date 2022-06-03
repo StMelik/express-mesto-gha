@@ -1,9 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
 const ERROR_CODE = require('./utils/constants');
 const auth = require('./middlewares/auth');
-const { errors } = require('celebrate')
 
 const { PORT = 3000 } = process.env;
 
@@ -23,14 +23,15 @@ app.use('/', (req, res) => {
     .send({ message: 'Ресурс не найден. Проверьте URL и метод запроса' });
 });
 
-app.use(errors())
+app.use(errors());
 
-app.use((err, _, res, next) => {
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
   res
     .status(err.statusCode)
     .send({ message: err.message });
 });
 
 app.listen(PORT, () => {
-  console.log(`Сервер работает на ${PORT} порту`);
+  console.log(`Сервер работает на ${PORT} порту`); // eslint-disable-line no-console
 });

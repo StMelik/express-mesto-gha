@@ -2,7 +2,7 @@ const router = require('express').Router();
 const {
   getCards, createCard, deleteCard, addLike, deleteLike,
 } = require('../controllers/cards');
-const { validationCard, validationCardId } = require('../utils/validation')
+const { validationCard, validationCardId } = require('../utils/validation');
 
 router.get('/', getCards);
 
