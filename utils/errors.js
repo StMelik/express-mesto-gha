@@ -1,35 +1,35 @@
 class NotFoundError extends Error {
   constructor(message) {
-    super(message)
-    this.statusCode = 404
+    super(message);
+    this.statusCode = 404;
   }
 }
 
 class AuthError extends Error {
   constructor(message) {
-    super(message)
-    this.statusCode = 401
+    super(message);
+    this.statusCode = 401;
   }
 }
 
 class ServerError extends Error {
   constructor(message) {
-    super(message)
-    this.statusCode = 500
+    super(message);
+    this.statusCode = 500;
   }
 }
 
 class BadRequestError extends Error {
   constructor(message) {
-    super(message)
-    this.statusCode = 400
+    super(message);
+    this.statusCode = 400;
   }
 }
 
 class ConflictError extends Error {
   constructor(message) {
-    super(message)
-    this.statusCode = 409
+    super(message);
+    this.statusCode = 409;
   }
 }
 
@@ -38,5 +38,5 @@ module.exports = {
   AuthError,
   ServerError,
   BadRequestError,
-  ConflictError
-}
+  ConflictError,
+};

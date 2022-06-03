@@ -1,7 +1,9 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const { NotFoundError, BadRequestError, ServerError, ConflictError } = require('../utils/errors')
+const {
+  NotFoundError, BadRequestError, ServerError, ConflictError,
+} = require('../utils/errors');
 
 const getUsers = (_, res, next) => {
   User
@@ -15,51 +17,53 @@ const getUser = (req, res, next) => {
     .findById(req.user)
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь по указанному id не найден.'))
+        next(new NotFoundError('Пользователь по указанному id не найден.'));
         return;
       }
       res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Пользователь по указанному id не найден.')
+        throw new BadRequestError('Пользователь по указанному id не найден.');
       }
-      throw new ServerError('Произошла ошибка.')
+      throw new ServerError('Произошла ошибка.');
     })
-    .catch(next)
+    .catch(next);
 };
 
 const createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
 
   bcrypt.hash(password, 10)
-    .then(hash => User.create({
+    .then((hash) => User.create({
       name,
       about,
       avatar,
       email,
-      password: hash
+      password: hash,
     }))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные при создании пользователя.')
+        throw new BadRequestError('Переданы некорректные данные при создании пользователя.');
       }
 
       if (err.code === 11000) {
-        throw new ConflictError('Такой пользователь уже существует!')
+        throw new ConflictError('Такой пользователь уже существует!');
       }
 
-      throw new ServerError('Произошла ошибка')
+      throw new ServerError('Произошла ошибка');
     })
-    .catch(next)
+    .catch(next);
 };
 
 const updateUser = (req, res, next) => {
   const { name, about } = req.body;
 
   if (!name || !about) {
-    next(new NotFoundError('Переданы некорректные данные при обновлении профиля.'))
+    next(new NotFoundError('Переданы некорректные данные при обновлении профиля.'));
     return;
   }
 
@@ -68,18 +72,18 @@ const updateUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные при обновлении профиля.')
+        throw new BadRequestError('Переданы некорректные данные при обновлении профиля.');
       }
-      throw new ServerError('Произошла ошибка.')
+      throw new ServerError('Произошла ошибка.');
     })
-    .catch(next)
+    .catch(next);
 };
 
 const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   if (!avatar) {
-    next(new NotFoundError('Переданы некорректные данные при обновлении аватара.'))
+    next(new NotFoundError('Переданы некорректные данные при обновлении аватара.'));
     return;
   }
 
@@ -88,26 +92,27 @@ const updateAvatar = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные при обновлении аватара.')
+        throw new BadRequestError('Переданы некорректные данные при обновлении аватара.');
       }
-      throw new ServerError('Произошла ошибка.')
+      throw new ServerError('Произошла ошибка.');
     })
-    .catch(next)
+    .catch(next);
 };
 
 const login = (req, res) => {
   const { email, password } = req.body;
 
   User.findUserByCredentials(email, password)
-    .then(user => {
+    .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
         'secret-key',
-        { expiresIn: '7d' })
+        { expiresIn: '7d' },
+      );
 
-      res.send({ token })
-    })
-}
+      res.send({ token });
+    });
+};
 
 module.exports = {
   getUsers,
@@ -115,5 +120,5 @@ module.exports = {
   createUser,
   updateUser,
   updateAvatar,
-  login
+  login,
 };

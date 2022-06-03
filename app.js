@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const ERROR_CODE = require('./utils/constants');
-const auth = require('./middlewares/auth')
+const auth = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
 
@@ -25,8 +25,8 @@ app.use('/', (req, res) => {
 app.use((err, _, res, __) => {
   res
     .status(err.statusCode)
-    .send({ message: err.message })
-})
+    .send({ message: err.message });
+});
 
 app.listen(PORT, () => {
   console.log(`Сервер работает на ${PORT} порту`);

@@ -1,5 +1,7 @@
 const Card = require('../models/card');
-const { NotFoundError, BadRequestError, ServerError, ConflictError, AuthError } = require('../utils/errors')
+const {
+  NotFoundError, BadRequestError, ServerError, AuthError,
+} = require('../utils/errors');
 
 const getCards = (_, res, next) => {
   Card
@@ -8,7 +10,7 @@ const getCards = (_, res, next) => {
     .catch(() => next(new ServerError('Произошла ошибка.')));
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card
@@ -16,41 +18,41 @@ const createCard = (req, res) => {
     .then((card) => res.send({ card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные при создании карточки.')
+        throw new BadRequestError('Переданы некорректные данные при создании карточки.');
       }
-      throw new ServerError('Произошла ошибка.')
+      throw new ServerError('Произошла ошибка.');
     })
-    .catch(next)
+    .catch(next);
 };
 
 const deleteCard = (req, res, next) => {
-  const { cardId } = req.params
+  const { cardId } = req.params;
 
   Card
     .findById(cardId)
-    .then(card => {
+    .then((card) => {
       if (!card) {
-        next(new NotFoundError('Карточка с указанным id не найдена.'))
+        next(new NotFoundError('Карточка с указанным id не найдена.'));
         return;
       }
 
       if (JSON.stringify(card.owner) !== JSON.stringify(req.user._id)) {
-        next(new AuthError('Невозможно удалить карточку.'))
-        return
+        next(new AuthError('Невозможно удалить карточку.'));
+        return;
       }
 
       Card.findByIdAndDelete(cardId)
-        .then(card => {
-          res.send({ card });
-        })
+        .then((c) => {
+          res.send({ c });
+        });
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        throw new BadRequestError('Передан некорректный id карточки.')
+        throw new BadRequestError('Передан некорректный id карточки.');
       }
-      throw new ServerError('Произошла ошибка.')
+      throw new ServerError('Произошла ошибка.');
     })
-    .catch(next)
+    .catch(next);
 };
 
 const addLike = (req, res, next) => {
@@ -58,18 +60,18 @@ const addLike = (req, res, next) => {
     .findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((card) => {
       if (!card) {
-        next(new NotFoundError('Передан несуществующий id карточки.'))
+        next(new NotFoundError('Передан несуществующий id карточки.'));
         return;
       }
       res.send({ card });
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        throw new BadRequestError('Переданы некорректные данные для постановки лайка.')
+        throw new BadRequestError('Переданы некорректные данные для постановки лайка.');
       }
-      throw new ServerError('Произошла ошибка.')
+      throw new ServerError('Произошла ошибка.');
     })
-    .catch(next)
+    .catch(next);
 };
 
 const deleteLike = (req, res, next) => {
@@ -77,7 +79,7 @@ const deleteLike = (req, res, next) => {
     .findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((card) => {
       if (!card) {
-        next(new NotFoundError('Передан несуществующий id карточки.'))
+        next(new NotFoundError('Передан несуществующий id карточки.'));
         return;
       }
 
@@ -85,11 +87,11 @@ const deleteLike = (req, res, next) => {
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        throw new BadRequestError('Переданы некорректные данные для снятии лайка.')
+        throw new BadRequestError('Переданы некорректные данные для снятии лайка.');
       }
-      throw new ServerError('Произошла ошибка.')
+      throw new ServerError('Произошла ошибка.');
     })
-    .catch(next)
+    .catch(next);
 };
 
 module.exports = {
