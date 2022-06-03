@@ -1,60 +1,65 @@
 const User = require('../models/user');
-const ERROR_CODE = require('../utils/constants');
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const { NotFoundError, BadRequestError, ServerError, ConflictError } = require('../utils/errors')
 
-const getUsers = (req, res) => {
+const getUsers = (_, res, next) => {
   User
     .find({})
     .then((users) => res.send({ users }))
-    .catch(() => res.status(ERROR_CODE.SERVER).send({ message: 'Произошла ошибка' }));
+    .catch(() => next(new ServerError('Произошла ошибка.')));
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   User
-    .findById(req.params.id)
+    .findById(req.user)
     .then((user) => {
       if (!user) {
-        res
-          .status(ERROR_CODE.NOT_FOUND)
-          .send({ message: 'Пользователь по указанному id не найден' });
+        next(new NotFoundError('Пользователь по указанному id не найден.'))
         return;
       }
       res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res
-          .status(ERROR_CODE.INCORRECT_DATA)
-          .send({ message: 'Пользователь по указанному id не найден' });
-        return;
+        throw new BadRequestError('Пользователь по указанному id не найден.')
       }
-      res.status(ERROR_CODE.SERVER).send({ message: 'Произошла ошибка' });
-    });
+      throw new ServerError('Произошла ошибка.')
+    })
+    .catch(next)
 };
 
-const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+const createUser = (req, res, next) => {
+  const { name, about, avatar, email, password } = req.body;
 
-  User
-    .create({ name, about, avatar })
+  bcrypt.hash(password, 10)
+    .then(hash => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash
+    }))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(ERROR_CODE.INCORRECT_DATA)
-          .send({ message: 'Переданы некорректные данные при создании пользователя.' });
-        return;
+        throw new BadRequestError('Переданы некорректные данные при создании пользователя.')
       }
-      res.status(ERROR_CODE.SERVER).send({ message: 'Произошла ошибка' });
-    });
+
+      if (err.code === 11000) {
+        throw new ConflictError('Такой пользователь уже существует!')
+      }
+
+      throw new ServerError('Произошла ошибка')
+    })
+    .catch(next)
 };
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   const { name, about } = req.body;
 
   if (!name || !about) {
-    res
-      .status(ERROR_CODE.INCORRECT_DATA)
-      .send({ message: 'Переданы некорректные данные при обновлении профиля' });
+    next(new NotFoundError('Переданы некорректные данные при обновлении профиля.'))
     return;
   }
 
@@ -63,22 +68,18 @@ const updateUser = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(ERROR_CODE.INCORRECT_DATA)
-          .send({ message: 'Переданы некорректные данные при обновлении профиля' });
-        return;
+        throw new BadRequestError('Переданы некорректные данные при обновлении профиля.')
       }
-      res.status(ERROR_CODE.SERVER).send({ message: 'Произошла ошибка' });
-    });
+      throw new ServerError('Произошла ошибка.')
+    })
+    .catch(next)
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   if (!avatar) {
-    res
-      .status(ERROR_CODE.INCORRECT_DATA)
-      .send({ message: 'Переданы некорректные данные при обновлении аватара' });
+    next(new NotFoundError('Переданы некорректные данные при обновлении аватара.'))
     return;
   }
 
@@ -87,14 +88,26 @@ const updateAvatar = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(ERROR_CODE.INCORRECT_DATA)
-          .send({ message: 'Переданы некорректные данные при обновлении аватара' });
-        return;
+        throw new BadRequestError('Переданы некорректные данные при обновлении аватара.')
       }
-      res.status(ERROR_CODE.SERVER).send({ message: 'Произошла ошибка' });
-    });
+      throw new ServerError('Произошла ошибка.')
+    })
+    .catch(next)
 };
+
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then(user => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'secret-key',
+        { expiresIn: '7d' })
+
+      res.send({ token })
+    })
+}
 
 module.exports = {
   getUsers,
@@ -102,4 +115,5 @@ module.exports = {
   createUser,
   updateUser,
   updateAvatar,
+  login
 };
