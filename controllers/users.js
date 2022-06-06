@@ -6,6 +6,7 @@ const NotFoundError = require('../utils/errors/NotFound');
 const BadRequestError = require('../utils/errors/BadRequest');
 const ServerError = require('../utils/errors/Server');
 const AuthError = require('../utils/errors/Auth');
+const { secretKey } = require('../utils/constants');
 
 const getUsers = (_, res, next) => {
   User
@@ -14,7 +15,7 @@ const getUsers = (_, res, next) => {
     .catch(() => next(new ServerError('Произошла ошибка.')));
 };
 
-const getMe = (req, res, next) => {
+const getMeInfo = (req, res, next) => {
   User
     .findById(req.user)
     .then((user) => {
@@ -132,7 +133,7 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        'secret-key',
+        secretKey,
         { expiresIn: '7d' },
       );
 
@@ -146,7 +147,7 @@ const login = (req, res, next) => {
 
 module.exports = {
   getUsers,
-  getMe,
+  getMeInfo,
   getUser,
   createUser,
   updateUser,

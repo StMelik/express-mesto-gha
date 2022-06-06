@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
-const ERROR_CODE = require('./utils/constants');
 const { validationUser } = require('./utils/validation');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -22,11 +21,7 @@ app.post('/signup', validationUser, createUser);
 app.use('/users', auth, require('./routers/users'));
 app.use('/cards', auth, require('./routers/cards'));
 
-app.use('/', (req, res) => {
-  res
-    .status(ERROR_CODE.NOT_FOUND)
-    .send({ message: 'Ресурс не найден. Проверьте URL и метод запроса' });
-});
+app.use('/', require('./routers/404'));
 
 app.use(errors());
 

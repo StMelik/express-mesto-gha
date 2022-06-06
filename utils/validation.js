@@ -1,7 +1,5 @@
 const { celebrate, Joi } = require('celebrate');
-
-// eslint-disable-next-line no-useless-escape
-const reqExpLink = /https?:\/\/(www)?[\-\.~:\/\?#\[\]@!$&'\(\)*\+,;=\w]+#?\b/;
+const { reqExpLink } = require('./constants');
 
 const validationUser = celebrate({
   body: Joi.object().keys({

@@ -1,6 +1,9 @@
+// eslint-disable-next-line no-useless-escape
+const reqExpLink = /https?:\/\/(www)?[\-\.~:\/\?#\[\]@!$&'\(\)*\+,;=\w]+#?\b/;
+
+const secretKey = 'secret-key';
+
 module.exports = {
-  INCORRECT_DATA: 400,
-  WRONG_DATA: 401,
-  NOT_FOUND: 404,
-  SERVER: 500,
+  reqExpLink,
+  secretKey,
 };
