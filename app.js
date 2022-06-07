@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
+const helmet = require('helmet');
 const { validationUser } = require('./utils/validation');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -15,6 +16,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
+
+app.use(helmet());
 
 app.post('/signin', validationUser, login);
 app.post('/signup', validationUser, createUser);
