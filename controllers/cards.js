@@ -1,14 +1,13 @@
 const Card = require('../models/card');
 const NotFoundError = require('../utils/errors/NotFound');
 const BadRequestError = require('../utils/errors/BadRequest');
-const ServerError = require('../utils/errors/Server');
 const ForbiddenError = require('../utils/errors/Forbidden');
 
 const getCards = (_, res, next) => {
   Card
     .find({})
     .then((cards) => res.send({ cards }))
-    .catch(() => next(new ServerError('Произошла ошибка.')));
+    .catch((err) => next(err));
 };
 
 const createCard = (req, res, next) => {
@@ -19,11 +18,11 @@ const createCard = (req, res, next) => {
     .then((card) => res.send({ card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные при создании карточки.');
+        next(new BadRequestError('Переданы некорректные данные при создании карточки.'));
+        return;
       }
-      throw new ServerError('Произошла ошибка.');
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 const deleteCard = (req, res, next) => {
@@ -42,18 +41,19 @@ const deleteCard = (req, res, next) => {
         return;
       }
 
-      Card.findByIdAndDelete(cardId)
-        .then((c) => {
-          res.send({ c });
-        });
+      // eslint-disable-next-line consistent-return
+      return Card.findByIdAndDelete(cardId);
+    })
+    .then((c) => {
+      res.send({ c });
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        throw new BadRequestError('Передан некорректный id карточки.');
+        next(new BadRequestError('Передан некорректный id карточки.'));
+        return;
       }
-      throw new ServerError('Произошла ошибка.');
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 const addLike = (req, res, next) => {
@@ -68,11 +68,11 @@ const addLike = (req, res, next) => {
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        throw new BadRequestError('Переданы некорректные данные для постановки лайка.');
+        next(new BadRequestError('Переданы некорректные данные для постановки лайка.'));
+        return;
       }
-      throw new ServerError('Произошла ошибка.');
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 const deleteLike = (req, res, next) => {
@@ -88,11 +88,11 @@ const deleteLike = (req, res, next) => {
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        throw new BadRequestError('Переданы некорректные данные для снятии лайка.');
+        next(new BadRequestError('Переданы некорректные данные для снятии лайка.'));
+        return;
       }
-      throw new ServerError('Произошла ошибка.');
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports = {

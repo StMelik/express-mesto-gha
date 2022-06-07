@@ -5,6 +5,7 @@ const { errors } = require('celebrate');
 const { validationUser } = require('./utils/validation');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const error = require('./middlewares/error');
 
 const { PORT = 3000 } = process.env;
 
@@ -21,16 +22,10 @@ app.post('/signup', validationUser, createUser);
 app.use('/users', auth, require('./routers/users'));
 app.use('/cards', auth, require('./routers/cards'));
 
-app.use('/', require('./routers/404'));
+app.use('/', auth, require('./routers/404'));
 
 app.use(errors());
-
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  res
-    .status(err.statusCode)
-    .send({ message: err.message });
-});
+app.use(error);
 
 app.listen(PORT, () => {
   console.log(`Сервер работает на ${PORT} порту`); // eslint-disable-line no-console

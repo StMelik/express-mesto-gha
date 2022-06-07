@@ -1,5 +1,4 @@
-// eslint-disable-next-line no-useless-escape
-const reqExpLink = /https?:\/\/(www)?[\-\.~:\/\?#\[\]@!$&'\(\)*\+,;=\w]+#?\b/;
+const reqExpLink = /^(https?:\/\/)(www\.)?([\w-.~:/?#[\]@!$&')(*+,;=]*\.?)*\.{1}[\w]{2,8}(\/([\w-.~:/?#[\]@!$&')(*+,;=])*)?/;
 
 const secretKey = 'secret-key';
 

@@ -4,7 +4,6 @@ const User = require('../models/user');
 const ConflictError = require('../utils/errors/Conflict');
 const NotFoundError = require('../utils/errors/NotFound');
 const BadRequestError = require('../utils/errors/BadRequest');
-const ServerError = require('../utils/errors/Server');
 const AuthError = require('../utils/errors/Auth');
 const { secretKey } = require('../utils/constants');
 
@@ -12,7 +11,7 @@ const getUsers = (_, res, next) => {
   User
     .find({})
     .then((users) => res.send({ users }))
-    .catch(() => next(new ServerError('Произошла ошибка.')));
+    .catch((err) => next(err));
 };
 
 const getMeInfo = (req, res, next) => {
@@ -27,11 +26,11 @@ const getMeInfo = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Пользователь по указанному id не найден.');
+        next(new BadRequestError('Пользователь по указанному id не найден.'));
+        return;
       }
-      throw new ServerError('Произошла ошибка.');
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 const getUser = (req, res, next) => {
@@ -46,11 +45,11 @@ const getUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Пользователь по указанному id не найден.');
+        next(new BadRequestError('Пользователь по указанному id не найден.'));
+        return;
       }
-      throw new ServerError('Произошла ошибка.');
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 const createUser = (req, res, next) => {
@@ -74,16 +73,17 @@ const createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные при создании пользователя.');
+        next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+        return;
       }
 
       if (err.code === 11000) {
-        throw new ConflictError('Такой пользователь уже существует!');
+        next(new ConflictError('Такой пользователь уже существует!'));
+        return;
       }
 
-      throw new ServerError('Произошла ошибка');
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 const updateUser = (req, res, next) => {
@@ -99,11 +99,11 @@ const updateUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные при обновлении профиля.');
+        next(new BadRequestError('Переданы некорректные данные при обновлении профиля.'));
+        return;
       }
-      throw new ServerError('Произошла ошибка.');
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 const updateAvatar = (req, res, next) => {
@@ -119,11 +119,11 @@ const updateAvatar = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные при обновлении аватара.');
+        next(new BadRequestError('Переданы некорректные данные при обновлении аватара.'));
+        return;
       }
-      throw new ServerError('Произошла ошибка.');
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 const login = (req, res, next) => {
@@ -139,10 +139,7 @@ const login = (req, res, next) => {
 
       res.send({ token });
     })
-    .catch((err) => {
-      throw new AuthError(err.message);
-    })
-    .catch(next);
+    .catch((err) => next(new AuthError(err.message)));
 };
 
 module.exports = {

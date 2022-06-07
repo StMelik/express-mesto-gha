@@ -4,7 +4,7 @@ const { reqExpLink } = require('./constants');
 const validationUser = celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
-    password: Joi.string().min(8).required(),
+    password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().pattern(reqExpLink),
@@ -13,7 +13,7 @@ const validationUser = celebrate({
 
 const validationUserId = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().length(24),
+    userId: Joi.string().length(24).hex().required(),
   }),
 });
 
@@ -39,7 +39,7 @@ const validationCard = celebrate({
 
 const validationCardId = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().length(24),
+    cardId: Joi.string().length(24).hex().required(),
   }),
 });
 
