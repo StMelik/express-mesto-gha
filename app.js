@@ -25,6 +25,12 @@ app.use(helmet());
 
 app.use(requestLogger);
 
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 app.post('/signin', validationUser, login);
 app.post('/signup', validationUser, createUser);
 
