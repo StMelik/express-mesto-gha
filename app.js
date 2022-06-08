@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 const helmet = require('helmet');
+const cors = require('cors');
+// const cookieParser = require('cookie-parser')
 const { validationUser } = require('./utils/validation');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -11,10 +13,18 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env;
 
+// const corsOptions = {
+// origin: 'http://localhost:3001',
+// credentials: true
+// }
+
 const app = express();
+
+app.use(cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(cookieParser());
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 

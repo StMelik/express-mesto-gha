@@ -6,7 +6,7 @@ const ForbiddenError = require('../utils/errors/Forbidden');
 const getCards = (_, res, next) => {
   Card
     .find({})
-    .then((cards) => res.send({ cards }))
+    .then((cards) => res.send(cards.reverse()))
     .catch((err) => next(err));
 };
 
@@ -15,7 +15,7 @@ const createCard = (req, res, next) => {
 
   Card
     .create({ name, link, owner: req.user._id })
-    .then((card) => res.send({ card }))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании карточки.'));
@@ -64,7 +64,7 @@ const addLike = (req, res, next) => {
         next(new NotFoundError('Передан несуществующий id карточки.'));
         return;
       }
-      res.send({ card });
+      res.send(card);
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
@@ -84,7 +84,7 @@ const deleteLike = (req, res, next) => {
         return;
       }
 
-      res.send({ card });
+      res.send(card);
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
