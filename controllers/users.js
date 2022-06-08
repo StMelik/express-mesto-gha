@@ -138,8 +138,6 @@ const login = (req, res, next) => {
       );
 
       res.send({ token });
-      // res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7 })
-      // res.send(user)
     })
     .catch((err) => next(new AuthError(err.message)));
 };
